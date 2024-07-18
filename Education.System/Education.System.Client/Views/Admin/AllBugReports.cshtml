@@ -1,0 +1,66 @@
+﻿@using System.Globalization
+@model List<ReturnBugReport>
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row" id="bugReportContainer">
+        @foreach (var bugReport in Model)
+        {
+            var cardClass = bugReport.Finished ? "card mb-4 completed" : "card mb-4";
+            <div class="col-md-4">
+                <div class="@cardClass">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="card-title">@bugReport.Name</h5>
+                        <span class="text-muted">@bugReport.CreatedAt.ToString(CultureInfo.InvariantCulture)</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">@bugReport.Content</p>
+                    </div>
+                    <div class="card-footer">
+                        <input type="hidden" class="bug-report-id" value="@bugReport.BugReportId" />
+                        @if (bugReport.Finished)
+                        {
+                            <button class="btn complete-button" disabled>Completed</button>
+                        }
+                        else
+                        {
+                            <button class="btn complete-button">Mark as Completed</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#bugReportContainer').on('click', '.complete-button', function () {
+                let $card = $(this).closest('.card');
+                let bugReportId = $card.find('.bug-report-id').val();
+
+                $.ajax({
+                    url: '@Url.Action("EndBugReport")',
+                    type: 'POST',
+                    data: { bugReportId: bugReportId },
+                    success: function (response) {
+                        if (response.success) {
+                            $card.addClass('completed');
+                            $(this).prop('disabled', true).text('Completed');
+                        } else {
+                            alert('Error marking as completed');
+                        }
+                    }.bind(this),
+                    error: function () {
+                        alert('Error marking as completed');
+                    }
+                });
+            });
+        });
+    </script>
+}

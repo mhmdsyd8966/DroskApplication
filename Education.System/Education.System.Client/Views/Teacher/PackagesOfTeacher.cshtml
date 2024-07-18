@@ -1,0 +1,90 @@
+﻿@model TeacherPackagesModelView<TeacherPackage>
+
+@{
+    ViewData["Title"] = "Teacher Packages & Exams";
+}
+
+
+<div class="container mt-5 mb-5">
+    <h2 class="text-center mb-4">Teacher Packages & Exams</h2>
+
+    <div class="d-flex justify-content-center mb-4">
+        <button id="showPackagesBtn" class="btn btn-primary mx-2">Show Packages</button>
+        <button id="showExamsBtn" class="btn btn-secondary mx-2">Show Exams</button>
+    </div>
+
+    <div id="contentContainer">
+        @await Html.PartialAsync("Components/_TeacherPackages", Model.Packages)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#showPackagesBtn').click(function () {
+                loadContent('@Url.Action("GetTeacherPackagesPartial")');
+            });
+
+            $('#showExamsBtn').click(function () {
+                loadContent('@Url.Action("GetExamsPartial")');
+            });
+        });
+
+        function loadContent(url) {
+            $.ajax({
+                url: url,
+                data: { teacherId: "@Model.TeacherId" },
+                type: 'GET',
+                success: function (data) {
+                    $('#contentContainer').html(data);
+                },
+                error: function () {
+                    alert('Error loading content');
+                }
+            });
+        }
+
+        function deletePackage(packageId) {
+            if (confirm("Are you sure you want to delete this package?")) {
+                $.ajax({
+                    url: `@Url.Action("DeletePackage", "Teacher")?packageId=${packageId}`,
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            loadContent('@Url.Action("GetTeacherPackagesPartial")');
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred while trying to delete the package.");
+                    }
+                });
+            }
+        }
+
+        function editExam(examId) {
+            window.location.href = '@Url.Action("EditExam", "Teacher")?examId=' + examId;
+        }
+
+        function deleteExam(examId) {
+            if (confirm("Are you sure you want to delete this exam?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteExam", "Teacher")',
+                    type: 'POST',
+                    data: { examId: examId },
+                    success: function (response) {
+                        if (response.success) {
+                            loadContent('@Url.Action("GetExamsPartial")');
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred while trying to delete the exam.");
+                    }
+                });
+            }
+        }
+    </script>
+}

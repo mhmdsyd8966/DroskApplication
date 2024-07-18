@@ -1,0 +1,105 @@
+﻿@model EditPostModelView
+
+@{
+    ViewData["Title"] = "Edit Post"; // Sets the title of the page to "Edit Post"
+}
+
+<h2>Edit Post</h2>
+
+<div class="container">
+    <form asp-action="EditPost" method="post" enctype="multipart/form-data" id="editPostForm">
+        <input type="hidden" asp-for="Id" /> <!-- Hidden input to hold the post ID -->
+
+        <input asp-for="PostImagePath" hidden="hidden" />
+        <input asp-for="TeacherId" hidden="hidden" />
+        <div class="mb-3">
+            <label for="Content" class="form-label">Content</label>
+            <textarea class="form-control" id="Content" asp-for="Content"></textarea> <!-- Textarea for post content -->
+        </div>
+
+        <div class="mb-3">
+            <label for="PostImageFile" class="form-label">Post Image</label>
+            <input type="file" class="form-control" id="PostImageFile" asp-for="PostImageFile" accept="image/*" />
+            <!-- Input for selecting an image file -->
+            <div id="imagePreview" class="mt-2">
+                @if (!string.IsNullOrEmpty(Model.PostImagePath))
+                {
+                    <img src="@Model.PostImagePath" alt="Post Image" class="img-thumbnail"
+                        style="max-width: 200px; max-height: 200px;" /> <!-- Preview of the existing post image -->
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="progress">
+                <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100">0%</div> <!-- Progress bar for file upload -->
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button> <!-- Submit button for the form -->
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Function to preview the uploaded image
+            function readURL(input, previewId) {
+                if (input.files && input.files[0]) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(previewId).html('<img src="' + e.target.result + '" alt="Preview Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />'); // Show the uploaded image preview
+                    };
+                    reader.readAsDataURL(input.files[0]); // Read the image file as a data URL
+                }
+            }
+
+            // Event handler for image input change
+            $("#PostImageFile").change(function () {
+                readURL(this, '#imagePreview'); // Update image preview when a new file is selected
+            });
+
+            // Event handler for form submission
+            $("#editPostForm").on('submit', function (e) {
+                e.preventDefault(); // Prevent default form submission
+                let formData = new FormData(this); // Create a FormData object from the form
+
+                $.ajax({
+                    url: '@Url.Action("EditPost", "Teacher")', // URL for the form submission
+                    type: 'POST', // HTTP method for the form submission
+                    data: formData, // Form data to be sent
+                    processData: false, // Do not process the data
+                    contentType: false, // Do not set content type
+                    xhr: function () {
+                        let xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = evt.loaded / evt.total * 100;
+                                $('#uploadProgress')
+                                    .css('width', percentComplete + '%')
+                                    .text(Math.round(percentComplete) + '%'); // Update the progress bar text
+                            }
+                        }, false);
+                        return xhr; // Return the custom XMLHttpRequest object
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = '@Url.Action("PostsForTeacher", "Global", new { teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value })';
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (response) {
+                        // Handle error
+                        alert('An error occurred while uploading the post'); // Alert the user on error
+                    }
+                });
+            });
+        });
+    </script>
+}

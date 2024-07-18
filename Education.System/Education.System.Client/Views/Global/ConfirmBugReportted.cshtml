@@ -1,0 +1,18 @@
+﻿@model Guid
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Ur bug report has been sent to the admin and it's id is "@Model.ToString()"</h2>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            setTimeout(() => {
+                window.location.assign('@(User.IsInRole(Roles.Student) ? Url.Action("StudentHome", "Student") : Url.Action("TeacherHome", "Teacher"))');
+            }, 3000)
+        })
+    </script>
+}

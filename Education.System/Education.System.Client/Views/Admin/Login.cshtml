@@ -1,0 +1,109 @@
+﻿@model SignInDto
+@{
+    ViewBag.Title = "Login";
+    Layout = "_FormPageLayout";
+}
+
+<div class="w-full max-w-[800px] mx-auto py-12 md:py-16 lg:py-20 bg-transparent">
+    <div class="rounded-lg border text-card-foreground shadow-sm w-full bg-transparent" data-v0-t="card">
+        <div class="flex flex-col space-y-1.5 p-6">
+            <h3 class="whitespace-nowrap text-2xl font-semibold leading-none tracking-tight">Login</h3>
+            <p class="text-sm text-muted-foreground">Sign in to your account</p>
+        </div>
+        <form id="userForm" class="p-6 space-y-4" method="post">
+            <div class="space-y-2">
+                <label
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 bg-transparent"
+                    for="@nameof(Model.Email)" asp-for="Email">
+                    @Html.DisplayNameFor(m => m.Email)
+                </label>
+                <input
+                    class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-transparent"
+                    asp-for="Email" placeholder="john@example.com" type="email" />
+                <span class="text-red-500 font-sans">@Html.ValidationMessageFor(m => m.Email)</span>
+            </div>
+            <div class="space-y-2">
+                <label for="@nameof(Model.Password)"
+                    class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 bg-transparent"
+                    asp-for="Password">
+                    @Html.DisplayNameFor(m => m.Password)
+                </label>
+                <div class="flex items-center gap-2">
+                    <input
+                        class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-transparent"
+                        asp-for="Password" type="password" />
+                    <input type="checkbox" id="showPassword" onkeypress=""
+                        class="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Show password" onclick="togglePasswordVisibility('Password', this)" />
+                    <label
+                        class="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm bg-transparent"
+                        for="showPassword">Show</label>
+                </div>
+                <span class="text-red-500 font-sans">@Html.ValidationMessageFor(m => m.Password)</span>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <input type="checkbox"
+                        class="h-4 w-4 rounded-sm border border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        asp-for="RememberMe" id="rememberMe" />
+                    <label
+                        class="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-sm bg-transparent"
+                        for="rememberMe">Remember me</label>
+                </div>
+            </div>
+            <div class="flex items-center p-6">
+                <button id="loginButton" type="submit"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 border border-sky-100focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 ml-auto bg-transparent">Login</button>
+                <div id="spinner" class="hidden ml-auto">Loading...</div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function togglePasswordVisibility(fieldId, toggleCheckbox) {
+            const passwordField = document.getElementById(fieldId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleCheckbox.checked = true;
+            } else {
+                passwordField.type = 'password';
+                toggleCheckbox.checked = false;
+            }
+        }
+
+        $(document).ready(function () {
+            $('#userForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                $('#loginButton').hide();
+                $('#spinner').removeClass('hidden').addClass('block');
+
+                $.ajax({
+                    url: '@Url.Action("Login")', // Change to your actual login URL
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = '@Url.Action("AdminHome")'; // Change to your actual success redirect URL
+                        } else {
+                            $('#loginButton').show();
+                            $('#spinner').removeClass('block').addClass('hidden');
+                            showPopUp(response.message, "red", "black");
+                        }
+                    },
+                    error: function (response) {
+                        $('#loginButton').show();
+                        $('#spinner').removeClass('block').addClass('hidden');
+                        showPopUp(response.message, "red", "black");
+                    }
+                });
+            });
+        });
+    </script>
+}

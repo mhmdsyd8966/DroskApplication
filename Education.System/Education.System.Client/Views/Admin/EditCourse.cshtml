@@ -1,0 +1,54 @@
+﻿@model EditCourseDtoViewModel
+@{
+    ViewData["Title"] = "EditCourse";
+    Layout = "_FormPageLayout";
+    ViewData["FieldsValidation"] = "input";
+}
+
+<div class="d-flex justify-content-center align-items-center w-100">
+
+    <form asp-action="EditCourse" class="d-flex flex-column gap-4 w-25 mt-5" id="userForm" method="post"
+        enctype="multipart/form-data">
+        <h3 class="text-center">Edit</h3>
+        <input asp-for="Id" type="hidden" />
+        <div class="form-floating">
+            <input class="form-control" asp-for="CourseName" />
+            <label asp-for="CourseName"></label>
+        </div>
+        <div class="input-group">
+            <input type="file" class="form-control" id="CoursePhotoInput" asp-for="CoursePhoto">
+            <label class="input-group-text" for="CoursePhotoInput" asp-for="CoursePhoto">Upload</label>
+        </div>
+        <div class="text-center" style="height: 200px">
+            <img id="imagePreview" src="@Model.CoursePhotoPath" alt="Image Preview" class="w-100 h-100" />
+        </div>
+        <div class="m-auto">
+            <button type="submit" class="btn btn-primary" id="submitButton">Edit</button>
+            <div id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#CoursePhotoInput').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imagePreview').attr('src', e.target.result).show();
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            $('#userForm').on('submit', function () {
+                $('#submitButton').hide();
+                $('#spinner').show();
+            });
+        });
+    </script>
+}

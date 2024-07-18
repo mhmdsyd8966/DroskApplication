@@ -1,0 +1,118 @@
+﻿@model CreateTeacherModelView
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_FormPageLayout";
+    var courses = Model.Courses;
+}
+
+<div class="w-100 d-flex justify-content-center flex-column gap-4 align-items-center mt-5">
+    <form id="userForm" method="post" enctype="multipart/form-data" class="gap-4 d-flex flex-column mt-5 p-4 rounded-4"
+        style="border:2px solid white;width:60%;">
+        <h2 class="text-center">Create Teacher</h2>
+        <div class="d-grid gap-2 w-100" style="grid-template-columns: 1fr 1fr; align-items: start;">
+            <div>
+                <div class="d-flex gap-2">
+                    <div class="w-100">
+                        <div class="form-floating w-100">
+                            <input id="FirstNameInput" class="form-control" asp-for="FirstName" />
+                            <label class="bg-transparent" asp-for="FirstName"></label>
+                        </div>
+                        <span class="text-danger" asp-validation-for="FirstName"></span>
+                    </div>
+                    <div class="w-100">
+                        <div class="form-floating w-100">
+                            <input id="LastNameInput" class="form-control" asp-for="LastName" />
+                            <label class="bg-transparent" asp-for="LastName"></label>
+                        </div>
+                        <span class="text-danger" asp-validation-for="LastName"></span>
+                    </div>
+                </div>
+                <div class="form-floating mt-2">
+                    <select id="CourseIdInput" class="form-select p-0 ps-3" asp-for="CourseId">
+                        <option value="">Select Course</option>
+                        @foreach (var course in courses)
+                        {
+                            <option value="@course.Id">@course.CourseName</option>
+                        }
+                    </select>
+                    <label class="bg-transparent" asp-for="CourseId"></label>
+                </div>
+                <span class="text-danger" asp-validation-for="CourseId"></span>
+            </div>
+            <div class="d-flex flex-column">
+                <div class="form-floating">
+                    <input id="TeacherImageInput" class="form-control" type="file" asp-for="TeacherImage" />
+                    <label class="bg-transparent" asp-for="TeacherImage"></label>
+                </div>
+                <span class="text-danger" asp-validation-for="TeacherImage"></span>
+                <div id="imagePreview" class="mt-2" style="display: none;">
+                    <img id="selectedImage" src="" alt="Selected Image" class="img-thumbnail"
+                        style="max-width: 100%; height: auto;" />
+                </div>
+            </div>
+        </div>
+        <div class="m-auto">
+            <button type="submit" class="btn btn-primary custom-nav-btn">Create</button>
+            <div class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#TeacherImageInput').on('change', function (event) {
+                const input = event.target;
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#selectedImage').attr('src', e.target.result);
+                        $('#imagePreview').show();
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+
+            $('#userForm').on('submit', function (e) {
+                e.preventDefault();
+
+                let formData = new FormData(this);
+                $('.btn.custom-nav-btn').hide();
+                $('.spinner-border').show();
+
+                $.ajax({
+                    url: '@Url.Action("CreateTeacher")',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $('.spinner-border').hide();
+                        $('.btn.custom-nav-btn').show();
+                        if (response.success) {
+                            // Handle success
+                            window.location.assign(`@Url.Action("ShowTeacherCreatedMessage")?email=${response.teacher.email}&password=${response.teacher.password}`);
+                        } else {
+                            showPopUp(response.message, "red", "black");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error
+                        $('.spinner-border').hide();
+                        $('.btn.custom-nav-btn').show();
+                        let errors = xhr.responseJSON;
+                        for (let key in errors) {
+                            if (errors.hasOwnProperty(key)) {
+                                $('span[asp-validation-for="' + key + '"]').text(errors[key][0]);
+                            }
+                        }
+                        showPopUp(error.message, "red", "black");
+                    }
+                });
+            });
+        });
+    </script>
+}

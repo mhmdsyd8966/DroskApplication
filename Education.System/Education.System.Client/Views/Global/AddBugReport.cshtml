@@ -1,0 +1,42 @@
+﻿@model BugReportDto
+
+@{
+    ViewData["Title"] = "Submit Bug Report";
+    Layout = "_FormPageLayout";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Submit Bug Report</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="AddBugReport" method="post" id="bugReportForm">
+                        <div class="mb-3">
+                            <label for="FirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="FirstName" asp-for="FirstName"
+                                placeholder="Enter your first name" required>
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="LastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="LastName" asp-for="LastName"
+                                placeholder="Enter your last name" required>
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <input id="UserId" asp-for="UserId" hidden="hidden">
+                        <div class="mb-3">
+                            <label for="BugContent" class="form-label">Bug Description</label>
+                            <textarea class="form-control" id="BugContent" asp-for="BugContent" rows="5"
+                                placeholder="Describe the bug in detail" required></textarea>
+                            <span asp-validation-for="BugContent" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

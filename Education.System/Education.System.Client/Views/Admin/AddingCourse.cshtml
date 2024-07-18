@@ -1,0 +1,56 @@
+﻿@model AddCourseDtoViewModel
+@{
+    ViewData["Title"] = "AddingCourse";
+    Layout = "_FormPageLayout";
+    ViewData["FieldsValidation"] = "input";
+}
+
+<div class="d-flex justify-content-center align-items-center w-100">
+    <form asp-action="AddingCourse" id="userForm" class="d-flex flex-column gap-5 w-25 mt-5" method="post"
+        enctype="multipart/form-data">
+
+        <h3 class="text-center">New Course</h3>
+
+        <div class="form-floating">
+            <input class="form-control" placeholder="put the post" id="floatingTextarea" asp-for="CourseName"></input>
+            <label asp-for="CourseName"></label>
+        </div>
+        <div class="input-group">
+            <input type="file" class="form-control" asp-for="CoursePhoto" id="CoursePhotoInput">
+            <label class="input-group-text" asp-for="CoursePhoto">Upload</label>
+        </div>
+        <div class="text-center">
+            <img id="imagePreview" src="#" alt="Image Preview" style="display: none; max-width: 100%; height: auto;" />
+        </div>
+        <div class="m-auto">
+            <button type="submit" class="btn btn-primary" id="submitButton">Create</button>
+            <div id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#CoursePhotoInput').on('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imagePreview').attr('src', e.target.result).show();
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#imagePreview').hide();
+                }
+            });
+
+            $('#userForm').on('submit', function () {
+                $('#submitButton').hide();
+                $('#spinner').show();
+            });
+        });
+    </script>
+}

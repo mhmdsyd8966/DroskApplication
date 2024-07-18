@@ -1,0 +1,77 @@
+﻿@model IEnumerable<TeacherPost>
+
+@{
+    ViewData["Title"] = "Posts";
+}
+
+
+
+<div class="container my-5">
+    <div class="position-relative d-flex justify-center items-center mb-4">
+        <h2 class="text-center w-25">Teacher Posts</h2>
+        <div class="text-right position-absolute right-0">
+            <a href="@Url.Action("AddPost")" class="btn btn-success">Add New Post</a>
+        </div>
+    </div>
+    <div class="flex flex-col gap-4 align-items-center mt-4 flex-wrap m-auto w-[90%]">
+        @foreach (var post in Model)
+        {
+            <div class="custom-post-card">
+                @if (!string.IsNullOrEmpty(post.PostPhoto))
+                {
+                    <div class="img-container">
+                        <img src="@post.PostPhoto" alt="post for @post.TeacherName" />
+                    </div>
+                    <div class="line-vertical"></div>
+                }
+                <div class="post-body @(!string.IsNullOrEmpty(post.PostPhoto) ? "w-50":"w-100")">
+                    <a href="@Url.Action("PostsForTeacher", "Teacher", new { teacherId = post.TeacherId })">
+                        <h2>@post.TeacherName</h2>
+                    </a>
+                    <div class="line-horizontal"></div>
+                    <p class="post-content">@post.Contents</p>
+                    <div class="line-horizontal"></div>
+                    <footer>
+                        @post.CreatedAt.ToString("MMMM dd, yyyy")
+                        @if (User.FindFirst(ClaimTypes.NameIdentifier)?.Value == post.TeacherId)
+                        {
+                            <div>
+                                <a href="@Url.Action("EditPost", "Teacher", new { postId = post.PostId })"
+                                    class="btn btn-warning">Edit</a>
+                                <button type="button" class="btn btn-danger"
+                                    onclick="deletePost('@(post.PostId)')">Delete</button>
+                            </div>
+                        }
+                    </footer>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deletePost(postId) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                $.ajax({
+                    url: `@Url.Action("DeletePost", "Teacher")?postId=${postId}`,
+                    type: 'POST',
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.reload();
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred while trying to delete the post.");
+                    }
+                });
+            }
+        }
+    </script>
+}

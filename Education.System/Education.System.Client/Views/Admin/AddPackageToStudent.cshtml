@@ -1,0 +1,174 @@
+﻿@* @model AddStudentCourseViewModel *@
+@{
+    ViewData["Title"] = "Add Student Course";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <!-- Stage 1: Get Student Email -->
+    <div id="emailFormContainer">
+        <form id="emailForm" class="d-flex flex-column gap-3">
+            <h5 class="text-center">Enter Student Email</h5>
+            <div class="form-group">
+                <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email" required>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" id="checkEmailButton">Search</button>
+                <output id="spinner" class="spinner-border text-primary" role="status" style="display: none;">
+                    <span class="sr-only">Loading...</span>
+                </output>
+                <div id="errorSymbol" class="text-danger" style="display: none;">
+                    &#10006; Student not found
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stage 2: Select Teacher -->
+    <div id="teacherFormContainer" style="display: none;">
+        <h5 class="text-center">Select Teacher</h5>
+        <form id="teacherForm" class="d-flex flex-column gap-3">
+            <div class="form-group">
+                <select id="teacherDropdown" class="form-control" required></select>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" id="nextToPackagesButton">Next</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stage 3: Select Package -->
+    <div id="packageFormContainer" style="display: none;">
+        <h5 class="text-center">Select Package</h5>
+        <form id="packageForm" class="d-flex flex-column gap-3">
+            <div class="form-group">
+                <select id="packageDropdown" class="form-control" required></select>
+            </div>
+            <div class="text-center">
+                <button type="button" class="btn btn-primary" id="submitButton">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let studentId = "";
+
+            // Stage 1: Check Student Email
+            $('#checkEmailButton').on('click', function () {
+                let email = $('#studentEmail').val();
+                $('#checkEmailButton').hide();
+                $('#spinner').show();
+
+                $.ajax({
+                    url: '@Url.Action("CheckStudentExist")',
+                    type: 'POST',
+                    data: { email: email },
+                    success: function (response) {
+                        $('#spinner').hide();
+                        if (response.success) {
+                            $('#emailFormContainer').hide();
+                            $('#teacherFormContainer').show();
+                            $('#studentId').val(response.studentId);
+                            studentId = response.studentId;
+                            loadTeachers();
+                        } else {
+                            $('#errorSymbol').show();
+                            setTimeout(function () {
+                                $('#errorSymbol').hide();
+                                $('#checkEmailButton').show();
+                            }, 2000);
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (response) {
+                        $('#spinner').hide();
+                        $('#errorSymbol').show();
+                        setTimeout(function () {
+                            $('#errorSymbol').hide();
+                            $('#checkEmailButton').show();
+                        }, 2000);
+                        $('#popup-message').text(response.message).fadeIn();
+                        setTimeout(function () {
+                            $('#popup-message').fadeOut();
+                        }, 2000);
+                    }
+                });
+            });
+
+            // Stage 2: Load Teachers and Move to Packages
+            function loadTeachers() {
+                $.ajax({
+                    url: '@Url.Action("GetTeachersAsJson")',
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            let teacherDropdown = $('#teacherDropdown');
+                            teacherDropdown.empty();
+                            $.each(response.teachers, function (index, teacher) {
+                                teacherDropdown.append(new Option(teacher.firstName + " " + teacher.lastName, teacher.id));
+                            });
+                        }
+                    }
+                });
+            }
+
+            $('#nextToPackagesButton').on('click', function () {
+                $('#teacherFormContainer').hide();
+                $('#packageFormContainer').show();
+                loadPackages();
+            });
+
+            // Stage 3: Load Packages
+            function loadPackages() {
+                let teacherId = $('#teacherDropdown').val();
+                $.ajax({
+                    url: '@Url.Action("GetPackagesOfTeacherAsJson")',
+                    type: 'GET',
+                    data: { teacherId: teacherId },
+                    success: function (response) {
+                        if (response.success) {
+                            let packageDropdown = $('#packageDropdown');
+                            packageDropdown.empty();
+                            $.each(response.packages, function (index, package) {
+                                packageDropdown.append(new Option(package.name, package.id));
+                            });
+                        }
+                    }
+                });
+            }
+
+            // Stage 4: Submit Final Form
+            $('#submitButton').on('click', function () {
+                let packageId = $('#packageDropdown').val();
+
+                $.ajax({
+                    url: '@Url.Action("SubmitStudentPackage")',
+                    type: 'POST',
+                    data: { studentId: studentId, packageId: packageId },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log('Package added successfully');
+                            $('#popup-message').text("Added Successfully").fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                            location.reload();
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,15 @@
+﻿@model IEnumerable<ExamReternedDto>
+
+<div class="row">
+    @foreach (var exam in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@exam.Name</h5>
+                    <p class="card-text">Exam Link: <a href="@exam.ExamLink">Go There :)</a></p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

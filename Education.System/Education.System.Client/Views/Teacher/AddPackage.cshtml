@@ -1,0 +1,89 @@
+﻿@model AddPackageModelView
+@{
+    ViewBag.Title = "Add Package";
+    Layout = "_FormPageLayout"; // Specify your layout page
+}
+
+<form id="addPackageForm" class="space-y-4 w-50 m-auto">
+    @Html.AntiForgeryToken()
+
+    <div>
+        <label for="PackageName" class="text-sm font-medium">Name</label>
+        <input asp-for="PackageName" id="PackageName" class="form-control" />
+        <span asp-validation-for="PackageName" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label for="PackagePrice" class="text-sm font-medium">Price</label>
+        <input asp-for="PackagePrice" id="PackagePrice" class="form-control" type="number" />
+        <span asp-validation-for="PackagePrice" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label for="PackagePhoto" class="text-sm font-medium">Image</label>
+        <input asp-for="PackagePhoto" id="PackagePhoto" class="form-control" type="file" />
+        <span asp-validation-for="PackagePhoto" class="text-danger"></span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="w-full bg-muted rounded-full dark:bg-muted-foreground">
+        <div id="progressBar"
+            class="bg-primary text-xs font-medium text-primary-foreground text-center p-0.5 leading-none rounded-full"
+            style="width: 0%;">
+            0%
+        </div>
+    </div>
+
+    <!-- Submit button -->
+    <button id="submitBtn" class="btn btn-primary m-auto" type="submit">
+        Submit
+    </button>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#addPackageForm').submit(function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                let formData = new FormData(this); // Create FormData object
+
+                $.ajax({
+                    url: '@Url.Action("AddPackage")', // Replace with your action method
+                    method: 'POST',
+                    data: formData,
+                    contentType: false, // Prevent jQuery from setting content type
+                    processData: false, // Prevent jQuery from processing data
+                    xhr: function () {
+                        let xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = (evt.loaded / evt.total) * 100;
+                                $('#progressBar').width(percentComplete + '%')
+                                    .text(percentComplete.toFixed(0) + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        console.log("Package Added Successfully");
+                        if (response.success) {
+                            window.location.href = '@Url.Action("PackagesOfTeacher", new { teacherId = User.FindFirst(ClaimTypes.NameIdentifier).Value })';
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle error response
+                        console.error(xhr.responseText);
+                        // Optionally, display an error message
+                    }
+                });
+            });
+        });
+    </script>
+}

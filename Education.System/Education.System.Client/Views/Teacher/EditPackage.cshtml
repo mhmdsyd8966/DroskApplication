@@ -1,0 +1,107 @@
+﻿@using System.Security.Claims
+@model EditPackageModelView
+
+@{
+    ViewData["Title"] = "Edit Package";
+}
+
+<h2>Edit Package</h2>
+
+<div class="container">
+    <form asp-action="EditPackage" method="post" enctype="multipart/form-data" id="userForm">
+        <input type="text" asp-for="Id" hidden="hidden" />
+
+        <div class="mb-3">
+            <label for="PackageName" class="form-label">Package Name</label>
+            <input type="text" class="form-control" id="PackageName" asp-for="PackageName" />
+        </div>
+
+        <div class="mb-3">
+            <label for="PackagePrice" class="form-label">Package Price</label>
+            <input type="number" class="form-control" id="PackagePrice" asp-for="PackagePrice" />
+        </div>
+
+        <input type="text" id="TeacherId" asp-for="TeacherId" hidden="hidden" />
+        <input type="text" asp-for="PackagePhotoPath" hidden="hidden" />
+
+        <div class="mb-3">
+            <label for="PackagePhotoFile" class="form-label">Package Photo</label>
+            <input type="file" class="form-control" id="PackagePhotoFile" asp-for="PackagePhotoFile" accept="image/*" />
+            <div id="photoPreview" class="mt-2">
+                @if (!string.IsNullOrEmpty(Model.PackagePhotoPath))
+                {
+                    <img src="@Model.PackagePhotoPath" alt="Package Photo" class="img-thumbnail"
+                        style="max-width: 200px; max-height: 200px;" />
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="progress">
+                <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function readURL(input, previewId) {
+                if (input.files && input.files[0]) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(previewId).html('<img src="' + e.target.result + '" alt="Preview Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#PackagePhotoFile").change(function () {
+                readURL(this, '#photoPreview');
+            });
+
+            $("#userForm").on('submit', function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: '@Url.Action("EditPackage", "Teacher")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function () {
+                        let xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = evt.loaded / evt.total * 100;
+                                $('#uploadProgress').css('width', percentComplete + '%')
+                                    .text(Math.round(percentComplete) + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        console.log("Package Added Successfully");
+                        if (response.success) {
+                            window.location.href = '@Url.Action("PackagesOfTeacher", new { teacherId = User.FindFirst(ClaimTypes.NameIdentifier).Value })';
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (response) {
+                        console.log("Failed");
+                    }
+                });
+            });
+        });
+    </script>
+}

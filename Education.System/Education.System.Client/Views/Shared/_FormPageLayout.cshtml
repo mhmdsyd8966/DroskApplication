@@ -1,0 +1,40 @@
+﻿@{
+    Layout = "_Layout";
+}
+@RenderBody()
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            let $userForm = $("#userForm");
+            let $submitButton = $userForm.find("button[type='submit']");
+
+            function checkFormValidity() {
+                let isValid = $userForm.valid();
+                $submitButton.prop('disabled', !isValid);
+            }
+            $userForm.on('change input', '@ViewData["FieldsValidation"]', function () {
+                checkFormValidity();
+            });
+
+            $userForm.on('submit', function (event) {
+                $.ajax({
+                    url: '@Url.Action("SetFormStatueToSubmitting", "StateManagement")',
+                    type: 'POST',
+                    success: () => {
+                        console.log("state has changed");
+                    }
+                });
+                checkFormValidity();
+                if (!$userForm.valid()) {
+                    event.preventDefault();
+                }
+            });
+
+            checkFormValidity();
+        });
+    </script>
+}

@@ -1,0 +1,56 @@
+﻿@model List<PackageLesson>
+
+@{
+    ViewData["Title"] = Model.FirstOrDefault()?.PackageName ?? "Package Lessons";
+    var packageId = (Guid)ViewData["PackageId"];
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-center m-auto text-2xl fw-bold ">@ViewData["Title"]</h1>
+        @if (User.IsInRole(Roles.Teacher))
+        {
+            <a href="@Url.Action("AddLesson", "Teacher", new { packageId })" class="btn btn-success">Add New Lesson</a>
+        }
+    </div>
+    <div id="lessonsContainer">
+        @foreach (var lesson in Model)
+        {
+            <figure class="snip0045 green">
+                <figcaption>
+                    <h2>@lesson.LessonName</h2>
+                </figcaption>
+                <img src="@lesson.LessonPhoto" alt="@lesson.LessonName" />
+                <div class="position">
+                    <a asp-controller="Global" asp-action="Lesson" asp-route-lessonId="@lesson.LessonId">Show Lesson</a>
+
+                </div>
+            </figure>
+
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function deleteLesson(lessonId) {
+            if (confirm("Are you sure you want to delete this lesson?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteLesson", "Teacher")',
+                    type: 'POST',
+                    data: { lessonId: lessonId },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.reload();
+                        } else {
+                            showPopUp(response.message, "red", "black");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred while trying to delete the lesson.");
+                    }
+                });
+            }
+        }
+    </script>
+}

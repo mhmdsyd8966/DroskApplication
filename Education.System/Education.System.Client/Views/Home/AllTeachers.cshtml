@@ -1,0 +1,68 @@
+﻿@model List<TeacherReturnDto>
+@{
+    ViewBag.Title = "Teachers Index";
+    Layout = "_Layout"; // Specify your layout page
+}
+
+<div>
+    <form id="filterForm" class="pt-4">
+        <div class="flex justify-center items-center gap-4 mb-6">
+            <input id="teacherSearch" name="teacherName"
+                class="text-black flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-full max-w-md"
+                placeholder="Search by teacher name" type="text" />
+            <div class="relative">
+                <select id="selectCourse" name="courseId"
+                    class="text-black flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-48">
+                    <option value="" class="text-black">Select course</option>
+                    @foreach (var course in ViewBag.Courses)
+                    {
+                        <option value="@course.Id" class="text-black">@course.CourseName</option>
+                    }
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-chevron-down h-4 w-4 opacity-50">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+            </div>
+            <button id="filterButton" type="submit"
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                Filter
+            </button>
+        </div>
+    </form>
+
+    <!-- Container for filtered teachers -->
+    <div id="filteredTeachersContainer">
+        @await Html.PartialAsync("Components/_FilteredTeachers", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#filterForm').submit(function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var formData = new FormData(this); // Create FormData object from form
+
+                $.ajax({
+                    url: '@Url.Action("FilterTeachers")',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,  // Prevent jQuery from processing data
+                    contentType: false,  // Prevent jQuery from setting content type
+                    success: function (response) {
+                        $('#filteredTeachersContainer').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                        showPopUp(error.message, 'red', 'black');
+                    }
+                });
+            });
+        });
+    </script>
+}

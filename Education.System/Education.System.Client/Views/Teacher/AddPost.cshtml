@@ -1,0 +1,93 @@
+﻿@model AddPostModelView
+
+@{
+    ViewData["Title"] = "Add Post";
+}
+
+
+<div class="container w-50 m-auto">
+    <h2 class="text-center fs-2">Add Post</h2>
+    <form asp-action="AddPost" method="post" enctype="multipart/form-data" id="userForm">
+        <div class="mb-3">
+            <label for="Content" class="form-label">Content</label>
+            <textarea class="form-control" id="Content" asp-for="Content" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="PostImage" class="form-label">Post Image</label>
+            <input type="file" class="form-control" id="PostImage" asp-for="PostImage" accept="image/*">
+            <div id="imagePreview" class="mt-2"></div>
+        </div>
+
+        <div class="mb-3">
+            <input type="hidden" asp-for="TeacherId" />
+        </div>
+
+        <div class="mb-3">
+            <div class="progress">
+                <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function readURL(input, previewId) {
+                if (input.files && input.files[0]) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(previewId).html('<img src="' + e.target.result + '" alt="Post Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#PostImage").change(function () {
+                readURL(this, '#imagePreview');
+            });
+
+            $("#userForm").on('submit', function (e) {
+                e.preventDefault();
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: '@Url.Action("AddPost", "Teacher")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function () {
+                        let xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = evt.loaded / evt.total * 100;
+                                $('#uploadProgress').css('width', percentComplete + '%').text(Math.round(percentComplete) + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            window.location.href = '@Url.Action("PostsForTeacher", new { teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value })';
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (response) {
+                        // Handle error
+                        alert('An error occurred while uploading the post');
+                    }
+                });
+            });
+        });
+    </script>
+}

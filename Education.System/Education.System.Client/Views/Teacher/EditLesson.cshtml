@@ -1,0 +1,141 @@
+﻿@model EditLessonModelView
+
+@{
+    ViewData["Title"] = "Edit Lesson";
+}
+
+<h2>Edit Lesson</h2>
+
+<div class="container">
+    <form asp-action="EditLesson" method="post" enctype="multipart/form-data" id="editLessonForm">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PackageId" />
+
+        <div class="mb-3">
+            <label for="Name" class="form-label">Lesson Name</label>
+            <input type="text" class="form-control" id="Name" asp-for="Name" />
+        </div>
+
+        <input asp-for="Id" hidden="hidden" />
+        <input asp-for="PackageId" hidden="hidden" />
+        <input asp-for="LessonImagePath" hidden="hidden" />
+        <input asp-for="VideoLink" hidden="hidden" />
+        <input asp-for="PdfPath" hidden="hidden" />
+        <div class="mb-3">
+            <label for="PdfFile" class="form-label">PDF File</label>
+            <input type="file" class="form-control" id="PdfFile" asp-for="PdfFile" accept=".pdf" />
+            <div id="pdfPreview" class="mt-2">
+                @if (!string.IsNullOrEmpty(Model.PdfPath))
+                {
+                    <embed class="w-50 m-auto" height="600" src="@Model?.PdfPath" />
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="LessonImageFile" class="form-label">Lesson Image</label>
+            <input type="file" class="form-control" id="LessonImageFile" asp-for="LessonImageFile" accept="image/*" />
+            <div id="imagePreview" class="mt-2">
+                @if (!string.IsNullOrEmpty(Model.LessonImagePath))
+                {
+                    <img src="@Model.LessonImagePath" alt="Lesson Image" class="img-thumbnail"
+                        style="max-width: 200px; max-height: 200px;" />
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="VideoFile" class="form-label">Video File</label>
+            <input type="file" class="form-control" id="VideoFile" asp-for="VideoFile" accept="video/*" />
+            <div id="videoPreview" class="mt-2">
+                @if (!string.IsNullOrEmpty(Model.VideoLink))
+                {
+                    <video src="@Model.VideoLink" controls style="max-width: 200px; max-height: 200px;"></video>
+                }
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="progress">
+                <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                    aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            function readURL(input, previewId, isVideo = false, isPdf = false) {
+                if (input.files && input.files[0]) {
+                    let reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (isVideo) {
+                            $(previewId).html('<video src="' + e.target.result + '" controls style="max-width: 200px; max-height: 200px;"></video>');
+                        } else if (isPdf) {
+                            $(previewId).html('<embed class="w-50 m-auto" height="600" src="' + e.target.result + '" />');
+                        } else {
+                            $(previewId).html('<img src="' + e.target.result + '" alt="Preview Image" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />');
+                        }
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            $("#PdfFile").change(function () {
+                readURL(this, "#pdfPreview", false, true);
+            });
+
+            $("#LessonImageFile").change(function () {
+                readURL(this, '#imagePreview', false, false);
+            });
+
+            $("#VideoFile").change(function () {
+                readURL(this, '#videoPreview', true);
+            });
+
+            $("#editLessonForm").on('submit', function (e) {
+                e.preventDefault();
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: '@Url.Action("EditLesson", "Teacher")',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function () {
+                        let xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = evt.loaded / evt.total * 100;
+                                $('#uploadProgress').css('width', percentComplete + '%')
+                                    .text(Math.round(percentComplete) + '%');
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    success: function (response) {
+                        // Handle success
+                        if (response.success) {
+                            window.location.href = '@Url.Action("Lesson", "Global", new { lessonId = Model.Id })';
+                            console.log('Lesson edited successfully');
+                        } else {
+                            $('#popup-message').text(response.message).fadeIn();
+                            setTimeout(function () {
+                                $('#popup-message').fadeOut();
+                            }, 2000);
+                        }
+                    },
+                    error: function (response) {
+                        // Handle error
+                        console.log('An error occurred while uploading the lesson');
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,66 @@
+﻿.custom-post-card {
+    width: 80%;
+    height: fit-content;
+    border: 1px solid #0077cc;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background-color: white;
+    color: black;
+}
+
+.custom-post-card>.img-container {
+    width: 40%;
+    border: 1px ridge gray;
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.post-body {
+    display: flex;
+    padding: 1rem 2rem;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+
+.post-body>a {
+    font-size: 2rem;
+    font-family: 'Times New Roman', Times, serif;
+    text-transform: capitalize;
+    transition: 0.4s ease-in-out;
+}
+
+.post-body>a>h1 :hover {
+    transform: scale(1.2);
+}
+
+.line-vertical {
+    height: 150px;
+    width: 1px;
+    background-color: black;
+}
+
+.line-horizontal {
+    width: 100%;
+    margin: 0.5rem auto;
+    height: 1px;
+    background-color: black;
+}
+
+.post-content {
+    margin: 2rem 0rem;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+
+
+footer {
+    display: flex;
+    justify-content: space-between;
+}

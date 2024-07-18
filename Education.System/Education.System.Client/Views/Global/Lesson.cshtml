@@ -1,0 +1,40 @@
+﻿@model PackageLesson
+
+@{
+    ViewData["Title"] = "Package Lessons";
+}
+
+@if (User.IsInRole(Roles.Teacher))
+{
+    <div class="d-flex gap-2 align-content-center float-end">
+        <a asp-action="EditLesson" asp-controller="Teacher" asp-route-lessonId="@Model.LessonId"
+            class="custom-nav-btn ms-3">
+            Edit Lesson
+        </a>
+    </div>
+}
+<div class="d-flex flex-column gap-3 align-items-center w-100" style="min-height:200px">
+    <h2 class="d-flex gap-3 align-items-center">
+        @Model?.PackageName 
+        <img src="/icons/right-arrow.png" width="20" /> 
+        @Model?.LessonName
+    </h2>
+    <div class="content d-flex gap-2 flex-column w-75">
+        <iframe src="@(Model?.LessonVideo)" height="600" class="w-75 m-auto"> </iframe>
+        <embed class="w-50 m-auto" height="600" src="@Model?.LessonPdf" />
+    </div>
+    <a class="download-pdf-link" onclick='downloadPdf("@Model?.LessonPdf")'>Download Pdf ??</a>
+</div>
+
+@section Scripts {
+    <script>
+        function downloadPdf(pdfUrl) {
+            let link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = '';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+}

@@ -1,0 +1,210 @@
+﻿@model List<Education.System.Core.Application.Advertisement>
+
+@{
+    ViewData["Title"] = "Advertisements";
+    var test = Model.Count < AdvertisementsConstrains.NumberOfPackages;
+}
+<style>
+    .teacher-card-active,
+    .card-active {
+        opacity: 0.7;
+    }
+
+    .package-card,
+    .teacher-card {
+        cursor: pointer;
+    }
+</style>
+<section class="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        @foreach (var adv in Model)
+        {
+            <div class="relative group bg-white rounded-3">
+                <img src="@adv.PackagePhoto" alt="@adv.PackageName" width="300" height="200"
+                    class="w-full h-48 object-cover rounded-t-lg" style="aspect-ratio: 300 / 200; object-fit: cover;" />
+                <div class="text-black shadow-md rounded-b-lg p-4">
+                    <h3 class="text-lg font-semibold mb-2">@adv.PackageName</h3>
+                    <p class="text-gray-500">@adv.TeacherName</p>
+                </div>
+                <button onclick="removeAdvertisement('@adv.PackageId')"
+                    class="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="h-4 w-4">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="container mx-auto py-12 px-4 sm:px-6 lg:px-8" id="teachersContainer2">
+    <h2>Select The Teacher</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 my-4" id="teachersContainerBody">
+    </div>
+    <button id="nextButton" class="btn btn-primary" onclick="showPackages()" disabled>Next</button>
+</section>
+
+<!-- Packages Table -->
+<section class="container mx-auto py-12 px-4 sm:px-6 lg:px-8" id="packagesContainer" style="display:none;">
+    <div class="position-relative">
+        <h2 class="text-center">Select The Package</h2>
+        <button onclick="showTeachers()"
+            class="absolute left-0 top-0 flex items-center px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back
+        </button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 my-4" id="packagesTableBody">
+    </div>
+    <button id="addPackageButton" class="btn btn-primary" onclick="addAdvertisement()" disabled>Add</button>
+</section>
+
+
+<!-- Confirmation Message -->
+<div id="confirmationMessage" class="alert alert-success" style="display:none;" role="alert">
+    Advertisement added successfully!
+</div>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedTeacherId = null;
+        let selectedPackageId = null;
+
+        $(document).ready(function () {
+            showTeachers();
+            $('#nextButton').prop('disabled', true);
+            $('#addPackageButton').prop('disabled', true);
+        });
+
+        function removeAdvertisement(packageId) {
+            $.ajax({
+                url: '@Url.Action("RemoveAdvertisement")',
+                type: 'POST',
+                data: { advertisementId: packageId },
+                success: function (response) {
+                    if (response.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to remove advertisement.');
+                    }
+                }
+            });
+        }
+
+        function showTeachers() {
+            $.ajax({
+                url: '@Url.Action("GetAllTeachersInJsonFormat")',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        let teachersContainerBody = $('#teachersContainerBody');
+                        teachersContainerBody.empty();
+                        let teachers = response.teachers;
+                        teachers.forEach(function (teacher) {
+                            let teacherCard = `
+                                            <div onclick="selectTeacher(this, '${teacher.id}')" class="teacher-card relative group bg-white rounded-3">
+                                                 <img src="${teacher.photo}"
+                                                 alt="${teacher.firstName} ${teacher.lastName}"
+                                                 width="300"
+                                                 height="200"
+                                                 class="w-full h-48 object-cover rounded-t-lg"
+                                                 style="aspect-ratio: 300 / 200; object-fit: cover;" />
+                                            <div class="text-black shadow-md rounded-b-lg p-4">
+                                                <h3 class="text-lg font-semibold mb-2">${teacher.firstName} ${teacher.lastName}</h3>
+                                            </div>
+                                        </div>
+                            `;
+                            teachersContainerBody.append(teacherCard);
+                        });
+                        $('#teachersContainer2').show();
+                        $('#packagesContainer').hide();
+                    }
+                }
+            });
+        }
+
+        function selectTeacher(row, teacherId) {
+
+            $('#teachersContainerBody').find(".teacher-card-active").removeClass('teacher-card-active');
+            $(row).addClass('teacher-card-active');
+            selectedTeacherId = teacherId;
+            $('#nextButton').prop('disabled', false);
+        }
+
+        function showPackages() {
+            if (selectedTeacherId) {
+                $.ajax({
+                    url: `@Url.Action("GetPackagesOfTeacherInJsonFormat")?teacherId=${selectedTeacherId}`,
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            let packagesTableBody = $('#packagesTableBody');
+                            packagesTableBody.empty();
+                            response.packages.forEach(function (package) {
+                                let packageRow = `
+                                                <div onclick="selectPackage(this, '${package.packageId}')" class="package-card relative group bg-white rounded-3">
+                                                    <img src="${package.packagePhoto}"
+                                                         alt="${package.packageName}"
+                                                         width="300"
+                                                         height="200"
+                                                         class="w-full h-48 object-cover rounded-t-lg"
+                                                         style="aspect-ratio: 300 / 200; object-fit: cover;" />
+                                                    <div class="text-black shadow-md rounded-b-lg p-4">
+                                                        <h3 class="text-lg font-semibold mb-2">${package.packageName}</h3>
+                                                    </div>
+                                                </div>`;
+                                packagesTableBody.append(packageRow);
+                            });
+                            $('#packagesContainer').show();
+                            $('#teachersContainer2').hide();
+                        } else {
+                            alert('Failed to load packages.');
+                        }
+                    }
+                });
+            }
+        }
+
+        function selectPackage(row, packageId) {
+
+            $('#packagesTableBody .package-card').removeClass('card-active');
+            $(row).addClass('card-active');
+            selectedPackageId = packageId;
+            if (@(Model is not null && test ? "true" : "false")) {
+                $('#addPackageButton').prop('disabled', false);
+            } else {
+                $('#addPackageButton').prop('disabled', true);
+            }
+        }
+
+        function addAdvertisement() {
+            if (selectedPackageId) {
+                $('#addButton').hide();
+                $('#loadingSpinner').show();
+                $.ajax({
+                    url: `@Url.Action("AddAdvertisement")?pakcageId=${selectedPackageId}`,
+                    type: 'POST',
+                    success: function (response) {
+                        $('#loadingSpinner').hide();
+                        $('#addButton').show();
+                        if (response.success) {
+                            $('#confirmationMessage').show();
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            alert('Failed to add advertisement.');
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+}

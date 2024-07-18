@@ -1,0 +1,61 @@
+﻿@model Education.System.Core.Application.CallSupport
+
+@{
+    ViewData["Title"] = "Call Support Details";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h2>Call Support Details</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Phone Number:</div>
+                <div class="col-md-8">@Model.phoneNumber</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">First Name:</div>
+                <div class="col-md-8">@Model.FirstName</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Last Name:</div>
+                <div class="col-md-8">@Model.LastName</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Transaction Photo:</div>
+                <div class="col-md-8">
+                    <img src="@Model.TransactionPhoto" alt="Transaction Photo" class="img-thumbnail"
+                        style="max-width: 200px; max-height: 200px;" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Package ID:</div>
+                <div class="col-md-8">@Model.PackageId</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Final Price:</div>
+                <div class="col-md-8">$@Model.finalprice.ToString("0.00")</div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.DiscountCode))
+            {
+                <div class="row mb-3">
+                    <div class="col-md-4 font-weight-bold">Discount Code:</div>
+                    <div class="col-md-8">@Model.DiscountCode</div>
+                </div>
+            }
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Status:</div>
+                <div class="col-md-8">@Model.Status</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">Student ID:</div>
+                <div class="col-md-8">@Model.StudentId</div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div>

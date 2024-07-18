@@ -1,0 +1,352 @@
+﻿@model HomeModelView
+
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "_Layout";
+}
+
+<style>
+    .cardP {
+        position: absolute;
+        width: 90%;
+        max-width: 600px;
+        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    }
+
+    .enter {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    .enter-active {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .exit {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .exit-active {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+</style>
+<div class="flex flex-col gap-12 m-auto my-3 w-[90%] overflow-hidden">
+
+    <div class="flex flex-col h-screen h-33 bg-opacity-50 bg-[#fff] text-black rounded-2">
+        <div class="flex items-center justify-between pt-2 px-2 lg:px-4">
+            <h2 class="text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">Our Packages</h2>
+            <a href="#"
+                class="text-lg fw-bold font-medium text-slate-200 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                View All
+            </a>
+        </div>
+        <div class="flex-1 flex items-center justify-center">
+            <div class="w-full h-full relative">
+                <div id="cardContainer" class="absolute inset-0 flex items-center justify-center">
+                    <!-- Cards will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="w-full py-12 md:py-16 lg:py-20 bg-opacity-50 bg-[#fff] text-black rounded-5">
+        <div class="container">
+            <div class="flex flex-col gap-6 md:gap-8 lg:gap-10">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
+                        Meet Our Teachers
+                    </h2>
+                    <a class="text-sm font-medium text-slate-200 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        asp-action="AllTeachers" rel="ugc">
+                        View All
+                    </a>
+                </div>
+                <div class="teacher-carousel-wrapper flex gap-1 overflow-hidden scroll-parent py-4 w-96 px-2">
+                    <div class="teacher-carousel flex gap-4 primary scroll-element-teacher"></div>
+                    <div class="teacher-carousel-2 flex gap-4 secondary scroll-element-teacher"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const $carousel = $(".teacher-carousel");
+            const $carousel2 = $(".teacher-carousel-2");
+            const $packageCarousel = $(".package-carousel");
+            const $packageCarousel2 = $(".package-carousel-2");
+            let teachers = [];
+            let packages = [];
+            let currentIndex = 0;
+            let packageCardWidth;
+            let teacherCardWidth;
+
+            function fetchTeachers() {
+                $.ajax({
+                    url: '@Url.Action("GetTeachersInJson", "Home")', // URL of the server-side action
+                    method: 'GET',
+                    success: function (response) {
+                        teachers = response;
+                        populateCarouselTeachers(teachers);
+                        teacherCardWidth = $carousel.find('.teacher-card').outerWidth(true);
+                    },
+                    error: function (xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            function fetchPackages() {
+                $.ajax({
+                    url: '@Url.Action("GetPackagesInJson", "Home")', // URL of the server-side action
+                    method: 'GET',
+                    success: function (response) {
+                        packages = response;
+                        packageCardWidth = $packageCarousel.find('.package-card').outerWidth(true); // Update card width
+                        showNextCard();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            }
+
+            function populateCarouselTeachers(teachers) {
+                $carousel.empty(); // Clear existing cards
+                let teacherIndex = 0;
+
+                function addCardToCarousel() {
+                    const teacher = teachers[teacherIndex];
+                    const cardHtml = `
+                                                <a class="teacher-card flex flex-col items-center justify-center gap-3 shrink-0 w-[160px] md:w-[180px] lg:w-[200px] border border-secondary border-2 rounded-3"
+                                                    href="@Url.Action("PackagesOfTeacher")?teacherId=${teacher.id}" rel="ugc">
+                                                    <div class="relative w-[100px] h-[100px] md:w-[110px] md:h-[110px] lg:w-[120px] lg:h-[120px] rounded-full overflow-hidden">
+                                                        <img
+                                                            src="${teacher.photo}"
+                                                            alt="${teacher.firstName} ${teacher.lastName}"
+                                                            width="130"
+                                                            height="130"
+                                                            class="w-full h-full object-cover"
+                                                            style="aspect-ratio: 150 / 150; object-fit: cover;"
+                                                        />
+                                                    </div>
+                                                    <div class="text-center text-black">
+                                                        <h3 class="text-base font-semibold md:text-lg lg:text-xl">${teacher.firstName} ${teacher.lastName}</h3>
+                                                        <p class="text-sm text-muted-foreground md:text-base">${teacher.courseName}</p>
+                                                    </div>
+                                                </a>`;
+
+                    const $card = $(cardHtml);
+
+                    // Calculate the current width of the carousel
+                    let currentWidth = 0;
+                    $carousel.children().each(function () {
+                        currentWidth += $(this).outerWidth(true); // Include margin in width calculation
+                    });
+
+                    // Calculate the width of the new card
+                    const cardWidth = calculateElementWidth(cardHtml);
+                    // Append the card only if it fits within the carousel's width
+                    if (currentWidth + cardWidth < $carousel.width()) {
+                        $carousel.append($card);
+                        $carousel2.append($card.clone());
+                        teacherIndex = (teacherIndex + 1) % teachers.length;
+                        addCardToCarousel(); // Recursively add the next card
+                    }
+                }
+                const styleSheets = document.styleSheets;
+
+                for (const styleSheet of styleSheets) {
+                    try {
+                        const rules = styleSheet.cssRules || styleSheet.rules;
+                        const containerWidth = $carousel.outerWidth();
+                        for (let i = 0; i < rules.length; i++) {
+                            const rule = rules[i];
+
+                            if (rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'primary') {
+                                styleSheet.deleteRule(i);
+
+                                const newKeyframes = `
+        @("keyframes") primary {
+                                                                      from {
+                                                                            /*left: 0;*/
+                                                                            transform: translateX(0);
+                                                                        }
+
+                                                                        to {
+                                                                            /*left: -100%;*/
+                                                                            transform: translateX(-${containerWidth}px);
+                                                                        }
+                                                            }
+                                                            `;
+
+                                styleSheet.insertRule(newKeyframes, i);
+                                break;
+                            } else if (rule.type === CSSRule.KEYFRAMES_RULE && rule.name === 'secondary') {
+                                const newKeyframes = `
+        @("keyframes") secondary {
+                                                                                     from {
+                                                                                        /*left: 100%;*/
+                                                                                        transform: translateX(${containerWidth}px);
+                                                                                    }
+
+                                                                                    to {
+                                                                                        /*left: 0;*/
+                                                                                        transform: translateX(0);
+                                                                                    }
+                                                                                }
+                                                                        `;
+
+                                styleSheet.insertRule(newKeyframes, i);
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+                addCardToCarousel(); // Start populating the carousel
+            }
+
+
+            function showNextCard() {
+                const cardContainer = $('#cardContainer');
+                const package = packages[currentIndex];
+
+                getPackageLink(package).then(packageLink => {
+                    const cardHtml = `
+                                                    <a class="cardP flex flex-col items-center justify-center gap-3 shrink-0 border border-secondary border-2 rounded-3 p-2 enter"
+                                                        href="${packageLink}" rel="ugc">
+                                                                <div class="relative w-full h-[300px] md:h-[350px] lg:h-[400px] rounded-4 overflow-hidden ms-1 me-1">
+                                                            <img src="${package.packagePhoto}" alt="${package.packageName}"
+                                                                class="w-full h-full object-cover"
+                                                                style="aspect-ratio: 1 / 1; object-fit: cover;">
+                                                        </div>
+                                                        <div class="text-center">
+                                                            <h3 class="text-base font-semibold md:text-lg lg:text-xl">${package.packageName}</h3>
+                                                            <p class="text-sm text-muted-foreground md:text-base">${package.teacherName}</p>
+                                                        </div>
+                                                    </a>
+                                                `;
+                    const $newCard = $(cardHtml);
+                    cardContainer.append($newCard);
+
+                    // Trigger reflow to apply the initial enter class
+                    $newCard[0].offsetHeight; // Trigger reflow
+                    $newCard.removeClass('enter').addClass('enter-active');
+
+                    // Find the existing card and animate it out
+                    const $currentCard = $('.cardP').not($newCard);
+                    if ($currentCard.length) {
+                        $currentCard.removeClass('enter enter-active').addClass('exit');
+                        $currentCard[0].offsetHeight; // Trigger reflow
+                        $currentCard.removeClass('exit').addClass('exit-active');
+
+                        setTimeout(() => {
+                            $currentCard.remove();
+                            currentIndex = (currentIndex + 1) % packages.length;
+                            setTimeout(showNextCard, 3000);
+                        }, 500); // Wait for the exit animation to complete
+                    } else {
+                        currentIndex = (currentIndex + 1) % packages.length;
+                        setTimeout(showNextCard, 3000);
+                    }
+                });
+            }
+
+
+            function getPackageLink(packageObj) {
+                return new Promise((resolve, reject) => {
+                    const defaultLink = '@Url.Action("UnAuthHome", "Home")';
+                    let packageLink = defaultLink;
+
+                    if (@(User!.Identity.IsAuthenticated ? 0 : 1)) {
+                        packageLink = '@Url.Action("Login", "Student")';
+                        resolve(packageLink);
+                    } else if (@(User.IsInRole(Roles.Teacher) ? 1 : 0)) {
+                        $.ajax({
+                            url: `@Url.Action("CheckTeacherIsOwnerJsonVersion", "Global")?teacherId=${packageObj.teacherId}`,
+                            method: "GET",
+                            success: function (response) {
+                                if (response.success) {
+                                    packageLink = `@Url.Action("LessonsOfPackage", "Global")?packageId=${packageObj.packageId}&teacherId=${packageObj.teacherId}`;
+                                }
+                                resolve(packageLink);
+                            },
+                            error: function () {
+                                resolve(packageLink);
+                            }
+                        });
+                    } else if (@(User.IsInRole(Roles.Student) ? 1 : 0)) {
+                        $.ajax({
+                            url: `@Url.Action("CheckStudentHasPackageJsonVersion", "Global")?packageId=${packageObj.packageId}`,
+                            method: "GET",
+                            success: function (response) {
+                                if (response.success) {
+                                    packageLink = `@Url.Action("LessonsOfPackage", "Global")?packageId=${packageObj.packageId}&teacherId=${packageObj.teacherId}`;
+                                }
+                                resolve(packageLink);
+                            },
+                            error: function () {
+                                resolve(packageLink);
+                            }
+                        });
+                    } else {
+                        resolve(packageLink);
+                    }
+                });
+            }
+
+            function calculateElementWidth(htmlString) {
+                // Create a temporary container
+                const $tempContainer = $('<div>').css({
+                    position: 'absolute',
+                    visibility: 'hidden',
+                    height: 'auto',
+                    width: 'auto'
+                }).appendTo('body');
+
+                // Append the HTML string to the temporary container
+                const $element = $(htmlString).appendTo($tempContainer);
+
+                // Calculate the width of the element
+                const elementWidth = $element.outerWidth(true); // Include margin in width calculation if necessary
+
+                // Remove the temporary container
+                $tempContainer.remove();
+
+                return elementWidth;
+            }
+
+            $(".teacher-carousel-wrapper").on("resize", () => {
+                const container = $(".teacher-carousel-wrapper").first();
+                const containerWidth = container.width();
+                let currentWidth = 0;
+                let cardWidth = 0;
+                do {
+                    $carousel.children().each(function () {
+                        cardWidth = $(this).width();
+                        currentWidth += $(this).outerWidth(true); // Include margin in width calculation
+                    });
+                    if (containerWidth < currentWidth) {
+                        $carousel.children().last().remove();
+                        $carousel2.children().last().remove();
+                    }
+                } while (containerWidth < currentWidth - cardWidth);
+                $carousel.children().each(function () {
+                    currentWidth += $(this).outerWidth(true); // Include margin in width calculation
+                });
+                $carousel.width(currentWidth);
+                $carousel2.width(currentWidth);
+            })
+            fetchTeachers();
+            fetchPackages();
+        });
+
+    </script>
+}

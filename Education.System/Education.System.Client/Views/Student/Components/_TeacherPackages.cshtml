@@ -1,0 +1,29 @@
+﻿@using Education.System.Core.Dto.TeacherDto
+@model IEnumerable<TeacherPackageForStudentDto>
+
+<div id="packageContainer">
+    @foreach (var item in Model)
+    {
+        <figure class="snip0045 @(item.Flag ? "green":"red")">
+            <figcaption>
+                <h2>@item.TeacherPackage.PackageName</h2>
+                <p><b>Price: </b> @item.TeacherPackage.PackagePrice</p>
+                <p><b>Num of lessons: </b> @item.TeacherPackage.NumberOfLessons</p>
+            </figcaption>
+            <img src="@item.TeacherPackage.PackagePhoto" alt="@item.TeacherPackage.PackageName" />
+            <div class="position">
+                @if (item.Flag)
+                {
+                    <a asp-controller="Global" asp-action="LessonsOfPackage"
+                        asp-route-packageId="@item.TeacherPackage.PackageId"
+                        asp-route-teacherId="@item.TeacherPackage.TeacherId">Show Lessons</a>
+                }
+                else
+                {
+                    <a asp-action="MakeCallSupport" asp-route-packageId="@item.TeacherPackage.PackageId">Buy Package</a>
+                }
+            </div>
+        </figure>
+
+    }
+</div>

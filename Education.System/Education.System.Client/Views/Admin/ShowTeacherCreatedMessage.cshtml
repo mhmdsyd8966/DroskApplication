@@ -1,0 +1,51 @@
+﻿@model Education.System.Core.Dto.TeacherDto.PrintTeacher
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<div class="card text-center bg-transparent text-light border-light w-50 m-auto">
+    <div class="card-header bg-light fw-bolder p-3 fs-5" style="color:#2f285a;">
+        New Teacher
+    </div>
+    <div class="card-body p-5">
+        <table class="mb-5 table bg-transparent table- text-start table-borderless table-teacher-details"
+            style="border-spacing:10px;">
+            <tbody class="bg-transparent text-light">
+                <tr class="mb-2 bg-transparent">
+                    <th scope="row" class="pe-4">
+                        Email:
+                    </th>
+                    <td>@Model.Email</td>
+                    <td><img src="/icons/copy-icon.png" onclick="copyClipboard('@Model.Email')" alt="copy icon"
+                            class="copy-icon" title="copy" /></td>
+                </tr>
+                <tr>
+                    <th scope="row" class=" pe-4">
+                        Password:
+                    </th>
+                    <td>@Model.Password</td>
+                    <td>
+                        <img src="/icons/copy-icon.png" onclick="copyClipboard('@Model.Password')" alt="copy icon"
+                            class="copy-icon" title="copy" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <a class="custom-nav-btn me-2" asp-action="AdminHome">Go To Main Page</a>
+        <a class="custom-nav-btn" asp-action="CreateTeacher">Create Again ?</a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(() => {
+            let copyClipboard = (textToCopy) => {
+                navigator.clipboard.writeText(textToCopy)
+                    .catch(function (error) {
+                        showPopUp(error, "red", "black");
+                    });
+            }
+        })
+    </script>
+}

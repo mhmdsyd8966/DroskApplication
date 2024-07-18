@@ -1,0 +1,130 @@
+﻿@model AddCallSupportModelView
+
+@{
+    ViewData["Title"] = "Add Call Support";
+}
+
+<div class="container mt-5">
+    <div class="row mb-3">
+        <div class="col text-right">
+            <form id="discountCodeForm" class="form-inline">
+                <input type="text" asp-for="DiscountCode" id="discountCode" class="form-control mb-2 mr-sm-2"
+                    pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                    placeholder="Discount Code" required="required" />
+                <button type="button" id="checkDiscountButton" class="btn btn-primary mb-2"
+                    onclick="checkDiscountCode()">Check</button>
+                <button type="button" id="dismisDiscountButton" class="btn btn-primary mb-2"
+                    onclick="dismisDiscountCode()">U don't have?</button>
+                <div id="spinner" class="ml-2" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+                <div id="discountError" style="display: none; color: red;">
+                    &#10006; Invalid code
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="discountMessageComponent" class="text-center" style="display: none;">
+        <h4 id="discountMessage"></h4>
+        <button type="button" class="btn btn-primary mb-2" onclick="showMainForm()">Proceed to Buy</button>
+        <button type="button" class="btn btn-secondary mb-2" onclick="showGoodbyeMessage()">Goodbye</button>
+    </div>
+
+    <form asp-action="MakeCallSupport" method="post" enctype="multipart/form-data" id="mainForm" style="display: none;">
+        <div class="form-group">
+            <label for="PhoneNumber">Phone Number</label>
+            <input type="text" class="form-control" id="PhoneNumber" asp-for="PhoneNumber" />
+        </div>
+        <div class="form-group">
+            <label for="FirstName">First Name</label>
+            <input type="text" class="form-control" id="FirstName" asp-for="FirstName" />
+        </div>
+        <div class="form-group">
+            <label for="LastName">Last Name</label>
+            <input type="text" class="form-control" id="LastName" asp-for="LastName" />
+        </div>
+        <div class="form-group">
+            <label for="TransactionPhoto">Transaction Photo</label>
+            <input type="file" class="form-control" id="TransactionPhoto" asp-for="TransactionPhoto" />
+        </div>
+        <input asp-for="PackageId" hidden="hidden" />
+        <div id="DiscountCodeHidden"></div>
+
+        <input type="text" hidden="hidden" id="StudentId" asp-for="StudentId" />
+
+        <button type="submit" class="btn btn-primary">Buy</button>
+    </form>
+</div>
+
+<div id="goodbyeMessageComponent" class="text-center" style="display: none;">
+    <h4>Thank you! Have a great day!</h4>
+</div>
+
+@section Scripts {
+    <script>
+        function dismisDiscountCode() {
+            $('#discountCode').prop('disabled', true);
+            $('#dismisDiscountButton').prop('disabled', true);
+            $('#checkDiscountButton').prop('disabled', true);
+            $('#DiscountCodeHidden').html('<input name="DiscountCode" hidden="hidden" value=""/>');
+            showDiscountMessage(false, 0); // No discount
+        }
+
+        function checkDiscountCode() {
+            let discountCode = $('#discountCode').val();
+            $('#checkDiscountButton').hide();
+            $('#spinner').show();
+
+            $.ajax({
+                url: '@Url.Action("CheckDiscount")',
+                type: 'POST',
+                data: { discountCode: discountCode },
+                success: function (response) {
+                    $('#spinner').hide();
+                    if (response.success) {
+                        $('#discountCode').prop('disabled', true);
+                        $('#checkDiscountButton').prop('disabled', true);
+                        $('#dismisDiscountButton').prop('disabled', true);
+                        $('#DiscountCodeHidden').html('<input name="DiscountCode" hidden="hidden" value="' + discountCode + '"/>');
+                        showDiscountMessage(true, @Model.Price - response.discountPercentege / 100 * @Model.Price);
+                    } else {
+                        $('#discountError').show();
+                        setTimeout(function () {
+                            $('#discountError').hide();
+                            $('#checkDiscountButton').show();
+                        }, 2000);
+                    }
+                },
+                error: function () {
+                    $('#spinner').hide();
+                    $('#discountError').show();
+                    setTimeout(function () {
+                        $('#discountError').hide();
+                        $('#checkDiscountButton').show();
+                    }, 2000);
+                }
+            });
+        }
+
+        function showDiscountMessage(hasDiscount, discountedPrice) {
+            let message = hasDiscount ?
+                `Congratulations! You got a discount. The new price is $${discountedPrice}.` :
+                "No discount applied. The price remains the same ( $@Model.Price )";
+            $('#discountMessage').text(message);
+            $('#discountMessageComponent').show();
+        }
+
+        function showMainForm() {
+            $('#discountMessageComponent').hide();
+            $('#mainForm').show();
+        }
+
+        function showGoodbyeMessage() {
+            $('#discountMessageComponent').hide();
+            $('#goodbyeMessageComponent').show();
+        }
+    </script>
+}

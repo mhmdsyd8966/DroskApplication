@@ -1,0 +1,26 @@
+﻿@model AddExamModelView
+@{
+    ViewBag.Title = "Add Package";
+    Layout = "_FormPageLayout"; // Specify your layout page
+}
+
+<form id="userForm" class="space-y-4 w-50 m-auto" asp-action="AddExam">
+    @Html.AntiForgeryToken()
+
+    <div>
+        <label for="PackageName" class="text-sm font-medium" asp-for="Name"></label>
+        <input asp-for="Name" id="PackageName" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div>
+        <label for="PackagePrice" class="text-sm font-medium" asp-for="ExamLink"></label>
+        <input asp-for="ExamLink" id="PackagePrice" class="form-control" />
+        <span asp-validation-for="ExamLink" class="text-danger"></span>
+    </div>
+
+    <!-- Submit button -->
+    <button id="submitBtn" class="btn btn-primary m-auto" type="submit">
+        Submit
+    </button>
+</form>

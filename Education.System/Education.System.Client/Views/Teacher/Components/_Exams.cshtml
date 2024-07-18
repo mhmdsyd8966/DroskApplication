@@ -1,0 +1,23 @@
+﻿@model IEnumerable<ExamReternedDto>
+@if (User.IsInRole(Roles.Teacher)) {
+    <div class="text-right mb-5">
+        <a href="@Url.Action("AddExam")" class="btn btn-success">Add New Exam</a>
+    </div>
+}
+<div class="row">
+    @foreach (var exam in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@exam.Name</h5>
+                    <p class="card-text">Exam Link: <a href="@exam.ExamLink" target="_blank">@exam.ExamLink</a></p>
+                    @if (User.IsInRole(Roles.Teacher) && User.FindFirst(ClaimTypes.NameIdentifier).Value == exam.TeacherId) {
+                        <a class="btn btn-warning mt-2" asp-action="EditExam" asp-route-examId="@exam.Id">Edit</a>
+                        <button class="btn btn-danger mt-2" onclick="deleteExam('@exam.Id')">Delete</button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "_Layout";
+}
+
+@functions {
+    public string GetStyleSheet()
+    {
+        var viewName = ViewContext.RouteData.Values["action"].ToString();
+        return Url.Content($"~/Views/{ViewContext.RouteData.Values["controller"]}/{viewName}.cshtml.css");
+    }
+}

@@ -1,0 +1,108 @@
+﻿.teacher-carousel {
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    position: relative;
+    margin-right: 1.5rem;
+    padding: 0;
+    border-radius: 10px;
+    width: 100%;
+    width: fit-content;
+}
+
+.teacher-carousel-inner {
+    display: flex;
+    position: absolute;
+    animation: scroll linear infinite;
+}
+
+.teacher-card {
+    display: inline-block;
+    margin-right: 1.5rem;
+    transition: 0.2s ease-in-out;
+    /*    width: 160px; !* Adjust width if necessary *!*/
+}
+
+.teacher-carousel-2 {
+    width: fit-content;
+}
+
+.scroll-parent {
+    position: relative;
+    width: 100vw;
+    height: 10rem;
+    overflow-x: hidden;
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+
+.scroll-parent-package {
+    position: relative;
+    width: 100vw;
+    height: 30rem;
+    overflow-x: hidden;
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+
+.scroll-element-teacher {
+    height: inherit;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(100% + 2rem);
+    animation: primary 7s linear infinite;
+}
+
+@media (max-width:1300px) {
+    .scroll-element-teacher {
+        width: calc(100% + 5rem);
+    }
+}
+
+@media (max-width:300px) {
+    .h-33 {
+        height: 33rem !important;
+    }
+}
+
+.teacher-card:hover~.teacher-carousel,
+.teacher-card:hover~.teacher-carousel-2 {
+    animation-play-state: paused;
+}
+
+.teacher-card:hover {
+    transform: scale(1.06);
+}
+
+.primary {
+    animation: primary 7s linear infinite;
+}
+
+.secondary {
+    animation: secondary 7s linear infinite;
+}
+
+@keyframes primary {
+    from {
+        /*left: 0;*/
+        transform: translateX(0);
+    }
+
+    to {
+        /*left: -100%;*/
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes secondary {
+    from {
+        /*left: 100%;*/
+        transform: translateX(100%);
+    }
+
+    to {
+        /*left: 0;*/
+        transform: translateX(0);
+    }
+}

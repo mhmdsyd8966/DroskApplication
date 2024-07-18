@@ -1,0 +1,44 @@
+﻿@model TeacherPackagesModelView<TeacherPackage>
+@{
+    ViewData["Title"] = "Teacher Packages and Exams";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Teacher Packages and Exams</h2>
+
+    <div class="d-flex justify-content-center mb-4">
+        <button id="showPackagesBtn" class="btn btn-primary mx-2">Show Packages</button>
+        <button id="showExamsBtn" class="btn btn-secondary mx-2">Show Exams</button>
+    </div>
+
+    <div id="contentContainer">
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadContent('@(Url.Action("GetTeacherPackagesPartial", "Admin"))?teacherId=@(Model.TeacherId)');
+            $('#showPackagesBtn').click(function () {
+                loadContent('@(Url.Action("GetTeacherPackagesPartial"))?teacherId=@(Model.TeacherId)');
+            });
+
+            $('#showExamsBtn').click(function () {
+                loadContent('@Url.Action("GetExamsPartial", "Home")?teacherId=@(Model.TeacherId)');
+            });
+
+            function loadContent(url) {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#contentContainer').html(data);
+                    },
+                    error: function () {
+                        alert('Error loading content');
+                    }
+                });
+            }
+        });
+    </script>
+}

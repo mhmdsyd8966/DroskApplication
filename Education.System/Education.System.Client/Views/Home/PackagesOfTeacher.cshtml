@@ -1,0 +1,23 @@
+﻿@model IEnumerable<TeacherPackage>
+
+@{
+    ViewData["Title"] = "Teacher Packages";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Teacher Packages</h2>
+    <div id="packageContainer">
+        @foreach (var item in Model)
+        {
+            <figure class="snip0045 red">
+                <figcaption>
+                    <h2>@item.PackageName</h2>
+                    <p><b>Num of lessons: </b> @item.NumberOfLessons</p>
+                    <p><b>Price: </b> @item.PackagePrice</p>
+                </figcaption>
+                <img src="@item.PackagePhoto" alt="@item.PackageName transaction photo" />
+                <div class="position"><a asp-action="Login" asp-controller="Student">Buy Package</a></div>
+            </figure>
+        }
+    </div>
+</div>

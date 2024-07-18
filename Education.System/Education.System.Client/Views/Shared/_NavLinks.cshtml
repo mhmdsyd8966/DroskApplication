@@ -1,0 +1,254 @@
+﻿@using Education.System.Client.Helpers.Constants
+@model ClaimsPrincipal
+
+<header class="flex w-full shrink-0 items-center px-4 md:px-6 py-4 mb-6 md:py-6 website-header">
+    <div class="flex items-center w-full lg:hidden">
+        <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-10"
+            type="button" id="menu-button" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobile-menu"
+            data-state="closed">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"
+                data-darkreader-inline-stroke="" style="--darkreader-inline-stroke: currentColor;">
+                <line x1="4" x2="20" y1="12" y2="12"></line>
+                <line x1="4" x2="20" y1="6" y2="6"></line>
+                <line x1="4" x2="20" y1="18" y2="18"></line>
+            </svg>
+            <span class="sr-only">Toggle navigation menu</span>
+        </button>
+        <a class="ml-4 flex items-center gap-2" href="#" rel="ugc">
+            <div class="logo-img-box">
+                <img src="@ClientConstants.WebsiteLogo" alt="Acme Inc" width="100" height="100"
+                    style="aspect-ratio: 64 / 64; object-fit: cover;" />
+            </div>
+        </a>
+    </div>
+    <a class="mr-6 hidden lg:flex items-center gap-2" href="#" rel="ugc">
+        <div class="logo-img-box">
+            <img src="@ClientConstants.WebsiteLogo" alt="Acme Inc" width="100" height="100"
+                style="aspect-ratio: 64 / 64; object-fit: cover;" />
+        </div>
+    </a>
+    <nav aria-label="Main" data-orientation="horizontal" dir="ltr"
+        class="relative z-10 max-w-max flex-1 items-center justify-center hidden lg:flex">
+        <div style="position: relative;">
+            <ul data-orientation="horizontal" class="group flex flex-1 list-none items-center justify-center space-x-1"
+                dir="ltr">
+                @if (User.Identity is not null && User.Identity.IsAuthenticated)
+                {
+
+                    <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                        data-radix-collection-item="" rel="ugc" asp-area=""
+                        asp-controller="@(Model.IsInRole(Roles.Student)?"Student":(Model.IsInRole(Roles.Admin)?"Admin":(Model.IsInRole(Roles.Teacher)?"Teacher":"Home")))"
+                        asp-action="@(Model.IsInRole(Roles.Student)?"StudentHome":(Model.IsInRole(Roles.Admin)?"AdminHome":(Model.IsInRole(Roles.Teacher)?"TeacherHome":"UnAuthHome")))">Home</a>
+
+                }
+                else
+                {
+
+                    <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                        data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Home"
+                        asp-action="UnAuthHome">Home</a>
+
+                }
+                <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                    data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Home"
+                    asp-action="AllTeachers">All Teachers</a>
+
+                @if (Model.Identity is not null && Model.Identity.IsAuthenticated)
+                {
+                    if (Model.IsInRole(Roles.Admin))
+                    {
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="AllCourses">Courses</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="CreateTeacher">Create Teacher</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="AllCallsSupport">Call Supports</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="AllBugReports">Bug Reports</a>
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="Advertisements">Advertisements</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Admin"
+                            asp-action="AddPackageToStudent">Add Package To Student</a>
+
+                    }
+                    if (Model.IsInRole(Roles.Teacher))
+                    {
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Teacher"
+                            asp-route-teacherId="@Model.FindFirst(ClaimTypes.NameIdentifier).Value" asp-action="AddPackage">Add
+                            Package</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Home"
+                            asp-route-teacherId="@Model.FindFirst(ClaimTypes.NameIdentifier).Value"
+                            asp-action="PackagesOfTeacher">My Packages</a>
+
+                    }
+                    if (Model.IsInRole(Roles.Student))
+                    {
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Student"
+                            asp-action="AllPackagesForStudent">My Packages</a>
+
+                        <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                            data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Student"
+                            asp-action="GetAllCallSupportsForStudnet">My Call Supports</a>
+
+                    }
+
+                    <a class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+                        data-radix-collection-item="" rel="ugc" asp-area="" asp-controller="Global"
+                        asp-action="Posts">Posts</a>
+
+                }
+            </ul>
+        </div>
+        <div class="absolute left-0 top-full flex justify-center"></div>
+    </nav>
+    <div class="ml-auto flex flex-col gap-2 sm:flex-row sm:gap-4 items-center">
+        @if (Model.Identity is not null && Model.Identity.IsAuthenticated)
+        {
+            <img src="/images/Profile.png" alt="profile" class="rounded-circle" width="75" />
+
+            <a class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                asp-area=""
+                asp-controller="@(Model.IsInRole(Roles.Student) ? "Student" : (Model.IsInRole(Roles.Admin) ? "Admin" : (Model.IsInRole(Roles.Teacher) ? "Teacher" : "")))"
+                asp-action="Logout">Log out</a>
+
+        }
+        else
+        {
+
+            <a class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+                asp-area="" asp-controller="Student" asp-action="Login">Log in</a>
+
+            <a class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 sm:h-9 sm:px-4"
+                asp-area="" asp-controller="Student" asp-action="Register">Register</a>
+        }
+    </div>
+</header>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="fixed inset-0 z-20 hidden bg-black bg-opacity-0">
+    <div
+        class="fixed top-0 left-0 w-3/4 max-w-xs h-full bg-white shadow-lg transform transition-transform duration-300 -translate-x-full">
+        <div class="flex items-center justify-between p-4 border-b">
+            <h2 class="text-lg font-semibold">Menu</h2>
+            <button id="close-menu" class="text-gray-600 hover:text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <nav class="p-4">
+            <ul class="space-y-4">
+                @if (Model.Identity is not null && Model.Identity.IsAuthenticated)
+                {
+
+                    <li>
+                        <a class="block text-gray-800 hover:text-gray-600" asp-area=""
+                            asp-controller="@(Model.IsInRole(Roles.Student)?"Student":(Model.IsInRole(Roles.Admin)?"Admin":(Model.IsInRole(Roles.Teacher)?"Teacher":"Home")))"
+                            asp-action="@(Model.IsInRole(Roles.Student)?"StudentHome":(Model.IsInRole(Roles.Admin)?"AdminHome":(Model.IsInRole(Roles.Teacher)?"TeacherHome":"UnAuthHome")))">Home</a>
+                    </li>
+
+                }
+                else
+                {
+
+                    <li>
+                        <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Home"
+                            asp-action="UnAuthHome">Home</a>
+                    </li>
+
+                }
+                <li>
+                    <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Home"
+                        asp-action="AllTeachers">All Teachers</a>
+                </li>
+
+                @if (Model.Identity is not null && Model.Identity.IsAuthenticated)
+                {
+                    if (Model.IsInRole(Roles.Admin))
+                    {
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="AllCourses">Courses</a>
+                        </li>
+
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="CreateTeacher">Create Teacher</a>
+                        </li>
+
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="AllCallsSupport">Call Supports</a>
+                        </li>
+
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="AllBugReports">Bug Reports</a>
+                        </li>
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="Advertisements">Advertisements</a>
+                        </li>
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Admin"
+                                asp-action="AddPackageToStudent">Add Package To Student</a>
+                        </li>
+
+                    }
+                    if (Model.IsInRole(Roles.Teacher))
+                    {
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Teacher"
+                                asp-route-teacherId="@Model.FindFirst(ClaimTypes.NameIdentifier).Value"
+                                asp-action="AddPackage">Add Package</a>
+                        </li>
+
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Home"
+                                asp-route-teacherId="@Model.FindFirst(ClaimTypes.NameIdentifier).Value"
+                                asp-action="PackagesOfTeacher">My Packages</a>
+                        </li>
+
+                    }
+                    if (Model.IsInRole(Roles.Student))
+                    {
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Student"
+                                asp-action="AllPackagesForStudent">My Packages</a>
+                        </li>
+
+                        <li>
+                            <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Student"
+                                asp-action="GetAllCallSupportsForStudnet">My Call Supports</a>
+                        </li>
+
+                    }
+
+                    <li>
+                        <a class="block text-gray-800 hover:text-gray-600" asp-area="" asp-controller="Global"
+                            asp-action="Posts">Posts</a>
+                    </li>
+
+                }
+
+            </ul>
+        </nav>
+    </div>
+</div>

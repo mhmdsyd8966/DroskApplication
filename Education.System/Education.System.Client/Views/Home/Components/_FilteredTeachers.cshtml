@@ -1,0 +1,23 @@
+﻿@model List<TeacherReturnDto>
+
+<div id="teacherList" class="grid grid-cols-1 gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:p-6">
+    @foreach (var teacher in Model)
+    {
+        <div
+            class="justify-between flex flex-col relative overflow-hidden transition-transform duration-300 ease-in-out rounded-lg shadow-lg group hover:shadow-xl hover:-translate-y-2">
+            <a class="absolute inset-0 z-10" asp-action="PackagesOfTeacher" asp-route-teacherId="@teacher.id">
+                <span class="sr-only">View lessons</span>
+            </a>
+            <img src="@teacher.photo" alt="@($"{teacher.firstName} {teacher.lastName}")" width="500" height="400"
+                class="object-cover w-full" style=" object-fit: cover;" />
+            <div class="p-4 bg-background">
+                <h3 class="text-xl font-bold">@($"{teacher.firstName} {teacher.lastName}")</h3>
+                <p class="text-sm text-muted-foreground">@teacher.CourseName</p>
+                <button asp-action="PackagesOfTeacher" asp-route-teacherId="@teacher.id"
+                    class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 mt-4">
+                    Packages & Exams
+                </button>
+            </div>
+        </div>
+    }
+</div>

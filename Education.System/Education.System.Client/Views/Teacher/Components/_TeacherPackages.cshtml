@@ -1,0 +1,37 @@
+﻿@model IEnumerable<TeacherPackage>
+
+<div class="text-right mb-5">
+    <a href="@Url.Action("AddPackage")" class="btn btn-success">Add New Package</a>
+</div>
+<div id="packageContainer">
+    @foreach (var package in Model)
+    {
+        <figure class="snip0045 green">
+            <figcaption>
+                <h2>@package.PackageName</h2>
+                <p><b>Price: </b> @package.PackagePrice</p>
+                <p><b>Num of lessons: </b> @package.NumberOfLessons</p>
+                <p><b>Num of students: </b> @package.NumberOfStudents</p>
+            </figcaption>
+            <img src="@package.PackagePhoto" alt="@package.PackageName" />
+            <div class="position">
+                @if (package.TeacherId.Equals(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                {
+                    <div>
+                        <a href="@Url.Action("LessonsOfPackage", "Global", new { packageId = package.PackageId, teacherId = User.FindFirst(ClaimTypes.NameIdentifier).Value })"
+                           class="btn btn-primary mt-2">Show Lessons</a>
+                        <a href="@Url.Action("EditPackage", new { packageId = package.PackageId })"
+                            class="btn btn-warning mt-2">Edit Package</a>
+                        <button type="button" class="btn btn-danger mt-2" onclick="deletePackage('@package.PackageId')">Delete
+                            Package</button>
+                    </div>
+                }
+                else
+                {
+                    @("Talk To Teacher")
+                }
+            </div>
+        </figure>
+    }
+
+</div>

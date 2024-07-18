@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+    font-size: 14px;
+    color: white !important;
+    background-color: #21282e;
+}
+
+.website-header {
+    border-bottom: 1px solid white;
+}
+
+.logo-img-box {
+    width: 5rem;
+    min-height: 3rem;
+    overflow: hidden;
+    position: relative;
+}
+
+    .logo-img-box > img {
+        position: absolute;
+        transform: scale(1.9) translate(4px,-10%);
+    }
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.logo-img {
+    width: 5rem;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+.custom-nav-btn {
+    color: white;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    background-color: transparent;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    .custom-nav-btn:hover {
+        color: #2f285a;
+        border: 1.5px solid #2f285a;
+        background-color: white;
+        transform: scale(1.05);
+    }
+
+    .custom-nav-btn:disabled {
+        background-color: #838383;
+        cursor: auto;
+    }
+
+        .custom-nav-btn:disabled:hover {
+            background-color: #838383;
+            color: white;
+            border: 1.5px solid white;
+            transform: scale(1);
+        }
+
+.custom-lesson-button {
+    color: white;
+    padding: 0.5rem 1rem;
+    border: 1.5px solid white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    background-color: #8679e6;
+    transition: 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+    .custom-lesson-button:hover {
+        color: white;
+        background-color: #2f285a;
+        border-color: white;
+    }
+
+.copy-icon {
+    transition: 0.2s ease-in-out;
+    background-color: transparent !important;
+    cursor: pointer;
+}
+
+    .copy-icon:hover {
+        transform: scale(1.1);
+    }
+
+.download-pdf-link {
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+    color: white;
+}
+
+    .download-pdf-link:hover {
+        transform: scale(1.05);
+    }
+
+.seperator {
+    width: 90%;
+    margin: 0 auto;
+    background-color: white;
+    height: 2px;
+}
+
+
+.edit-icon-post {
+    cursor: pointer;
+    transition: 0.1s ease-in-out;
+}
+
+    .edit-icon-post:hover {
+        transform: scale(1.05);
+    }
+
+.detail-box {
+    width: 40%;
+    min-height: 200px;
+    transition: 0.15s ease-in-out;
+    box-shadow: 6px 6px 21px -3px rgb(111, 25, 159);
+}
+
+    .detail-box:hover {
+        transform: translate3d(-12px,-11px,6px);
+    }
+
+.popup-message {
+    display: none;
+    position: fixed;
+    text-align: center;
+    z-index: 1000;
+    font-size: 1.5rem;
+    top: 20px;
+    left: 50%;
+    word-break: break-word;
+    max-width: 400px;
+    transform: translateX(-50%);
+    padding: 20px 50px;
+    background-color: #aa5c54;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.table-teacher-details > tbody > tr > * {
+    background-color: transparent !important;
+    color: white !important;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.complete-button {
+    background-color: #28a745;
+    color: #fff;
+}
+
+    .complete-button:hover {
+        background-color: #218838;
+    }
+
+.card.completed {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+    .card.completed .card-header,
+    .card.completed .card-body,
+    .card.completed .card-footer {
+        color: #155724;
+    }

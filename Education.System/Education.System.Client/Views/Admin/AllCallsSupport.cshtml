@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Education.System.Core.Application.CallSupport>
+
+@{
+    ViewData["Title"] = "Call Support List";
+}
+
+<div class="container mt-5">
+    <div class="m-auto flex flex-col gap-3 w-48 items-center">
+        <h1 class="mb-4">Call Supports</h1>
+
+        <!-- Radio Buttons to toggle between Pending and All -->
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btnradio" id="filterPending" autocomplete="off"
+                value="@CallSupportStatus.Pending" onclick="loadCallSupports('Pending')">
+            <label class="btn btn-outline-primary" for="filterPending">Pending</label>
+
+            <input type="radio" class="btn-check" name="btnradio" id="filterAll" autocomplete="off" value="All" checked
+                onclick="loadCallSupports('All')">
+            <label class="btn btn-outline-primary" for="filterAll">All</label>
+        </div>
+    </div>
+
+    <!-- Container to hold the call support cards -->
+    <div id="callSupportContainer" class="mt-4">
+        @await Html.PartialAsync("Components/_CallSupportList", Model)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadCallSupports(filter) {
+            $.ajax({
+                url: '@Url.Action("AllCallsSupportPartial")',
+                type: 'GET',
+                data: { filter: filter.toLowerCase() },
+                success: function (data) {
+                    $('#callSupportContainer').html(data);
+                },
+                error: function () {
+                    $('#popup-message').text("something wrong").fadeIn();
+                    setTimeout(function () {
+                        $('#popup-message').fadeOut();
+                    }, 2000);
+                    alert('Error loading call supports');
+                }
+            });
+        }
+
+        function handleCallSupportAction(actionUrl) {
+            $.ajax({
+                url: actionUrl,
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error processing request');
+                    }
+                },
+                error: function (data) {
+                    $('#popup-message').text(data.message).fadeIn();
+                    setTimeout(function () {
+                        $('#popup-message').fadeOut();
+                    }, 2000);
+                    alert('Error processing request');
+                }
+            });
+        }
+    </script>
+}

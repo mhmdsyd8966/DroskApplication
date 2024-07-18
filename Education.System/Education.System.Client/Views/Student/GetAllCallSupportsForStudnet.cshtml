@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Education.System.Core.Application.CallSupport>
+
+@{
+    ViewData["Title"] = "Call Support List";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Call Support List</h2>
+    <div id="callSupportContainer">
+        @foreach (var call in Model)
+        {
+            <figure
+                class="snip0045 @(call.Status == CallSupportStatus.Rejected ? "red" : call.Status == CallSupportStatus.Accepted ? "green" : "yellow")">
+                <figcaption>
+                    <h2>@call.FirstName <span>@call.LastName</span></h2>
+                    <p><b>Phone Number: </b> @call.phoneNumber</p>
+                    <p><b>Price: </b> @call.finalprice</p>
+                </figcaption>
+                <img src="@call.TransactionPhoto" alt="@call.FirstName transaction photo" />
+                <div class="position">@call.Status</div>
+            </figure>
+        }
+    </div>
+</div>

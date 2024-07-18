@@ -1,0 +1,125 @@
+﻿@using Education.System.Client.Helpers.Constants
+@{
+    var teamName = "Code Crafters";
+    var returnData = (string)ViewData["ServiceReturn"]!;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TheLayer</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Education.System.Client.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    @RenderSection("Styles", required: false)
+    <style>
+        /* Disable interactions for the rest of the page when the menu is open */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        /* Blur effect */
+        #overlay {
+            backdrop-filter: blur(5px);
+            z-index: 10;
+        }
+
+        /* Transition for the mobile menu */
+        #mobile-menu>div {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-temp pb-5">
+        @await Html.PartialAsync("_NavLinks", User)
+
+
+        <div class="container pb-5">
+            <main role="main" class="pb-3">
+                <div id="popup-message" class="popup-message">
+                </div>
+                @RenderBody()
+            </main>
+        </div>
+
+        <footer class="border-top footer text-muted d-flex justify-content-around align-items-center pt-4 pb-4 mt-5">
+            <div class="text-light w-100 d-flex align-items-center ps-4">
+                <span>&copy; @DateTime.Today.Year -</span>
+                <a href="#" class="text-light text-decoration-none d-inline ps-2 pe-2">
+                    <img alt="code crafters" src="@ClientConstants.CodeCraftersLogo" width="30" />
+                </a>
+                <span>@teamName </span>
+
+            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole(Roles.Student) || User.IsInRole(Roles.Teacher))
+                {
+                    <div class="text-light me-5">
+                        <a asp-action="AddBugReport" asp-controller="Global" class="text-light text-decoration-none">
+                            Have Trouble ?
+                        </a>
+                    </div>
+                }
+            }
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        $(document).ready(function () {
+            if ("@returnData") {
+                $('#popup-message').text("@returnData").fadeIn();
+                setTimeout(function () {
+                    $('#popup-message').fadeOut();
+                }, 2000);
+            }
+        });
+
+        let showPopUp = (message, bgColor, color) => {
+            $('#popup-message').text(`${message}`)
+                .css("background-color", bgColor)
+                .css("color", color)
+                .fadeIn();
+            setTimeout(function () {
+                $('#popup-message').fadeOut();
+            }, 2000);
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#menu-button').on('click', function () {
+                $('#mobile-menu').removeClass('hidden');
+                setTimeout(() => {
+                    $('#mobile-menu > div').removeClass('-translate-x-full');
+                }, 10); // Small timeout to allow the browser to apply the initial state
+                $('#overlay').removeClass('hidden');
+                $('body').addClass('overflow-hidden');
+            });
+
+            function closeMenu() {
+                $('#mobile-menu > div').addClass('-translate-x-full');
+                setTimeout(() => {
+                    $('#mobile-menu').addClass('hidden');
+                }, 300); // Match this timeout with the CSS transition duration
+                $('#overlay').addClass('hidden');
+                $('body').removeClass('overflow-hidden');
+            }
+
+            $('#close-menu, #overlay').on('click', closeMenu);
+        });
+    </script>
+</body>
+
+</html>
