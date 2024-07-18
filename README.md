@@ -1,6 +1,4 @@
-Certainly! Below is a sample README file for your application "Drosk". This README provides an overview of the application, its roles, services, and responsibilities of each role.
 
----
 
 # Drosk Application
 
@@ -42,29 +40,25 @@ Drosk is an educational platform designed to facilitate learning through structu
 - Lessons are educational modules created by teachers within packages.
 
 ### Exams
-- [Brief description of exam-related services, if applicable]
+- Teachers can publish a new exam.
+- Student go to the exams and try to solve it.
 
 ### Posts
 - Teachers can create posts to share updates and information with students.
 
-## Screenshots
-- [Insert screenshots here to visually represent the application's interface and features]
 
-## Getting Started
-- [Instructions on how to set up and deploy the application, if applicable]
+## Technologies Used
 
-## Usage
-- [Guide on how to use the application for each role]
+This project was built using the following technologies:
+- .Net 8
+- asp.net core mvc
+- entity freamework
+- linq
+- sql server
 
 ## Contributing
-- [Instructions for potential contributors on how to submit changes or improvements]
+- [Amr Shalaby](https://github.com/amr1234567)
+- [Mohamed El-Sayed](https://github.com/mhmdelsyd)
+  
 
-## Support
-- [Contact information for support or inquiries]
 
-## License
-- [Information about the license under which the application is distributed]
-
----
-
-Feel free to customize this README file further based on additional features, specific implementation details, or any other relevant information about your application "Drosk".
